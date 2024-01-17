@@ -2,7 +2,9 @@ package com.example;
 
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.HttpResponse;
+import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Error;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.http.client.annotation.Client;
@@ -12,8 +14,8 @@ import jakarta.inject.Inject;
 
 public class AIDevsZadania {
 
-    public @Nullable ApiTaskResponse receiveTask(String token) {
-        HttpResponse<ApiTaskResponse> response = tokenClient.getTask(token);
+    public @Nullable ApiBlogResponse receiveTask(String token) {
+        HttpResponse<ApiBlogResponse> response = tokenClient.getTask(token);
         if (response.status().getCode() == 200) {
             System.out.println("Token request successful. Response: " + response.body());
         } else {
@@ -26,13 +28,20 @@ public class AIDevsZadania {
     interface TokenClient {
 
         @Post("/answer/{token}")
-        void answer(String token, @Body String json);
+        HttpResponse<Object> answer(String token, @Body String json);
 
-        @Post("/token/inprompt")
+        @Post("/token/blogger")
         HttpResponse<ApiTokenResponse> getToken(@Body ApiKeyRequest request);
 
         @Get("/task/{token}")
-        HttpResponse<ApiTaskResponse> getTask(String token);
+        HttpResponse<ApiBlogResponse> getTask(String token);
+
+        @Error(status = HttpStatus.BAD_REQUEST)
+        default Object handleHttpError(Exception e) {
+            // Handle specific HTTP errors here
+            System.out.println("Error occurred: " + e.getMessage());
+            return new Object();
+        }
     }
     @Serdeable
     public class ApiKeyRequest {
@@ -71,7 +80,7 @@ public class AIDevsZadania {
         return response.body().getToken();
     }
 
-    public void answer(String token, String answer) {
-        tokenClient.answer(token, "{\"answer\": \"" + answer + "\"}");
+    public HttpResponse<Object> answer(String token, String answer) {
+        return tokenClient.answer(token, "{\"answer\": " + answer + "}");
     }
 }

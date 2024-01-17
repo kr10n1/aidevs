@@ -1,5 +1,9 @@
 package com.example;
 
+import com.theokanning.openai.completion.chat.ChatCompletionRequest;
+import com.theokanning.openai.completion.chat.ChatMessage;
+import com.theokanning.openai.completion.chat.ChatMessageRole;
+import com.theokanning.openai.service.OpenAiService;
 import io.micronaut.http.HttpHeaders;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Body;
@@ -7,6 +11,11 @@ import io.micronaut.http.annotation.Header;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.http.client.annotation.Client;
 import jakarta.inject.Singleton;
+
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 @Singleton
 public class OpenAIAPI {
@@ -38,13 +47,27 @@ public class OpenAIAPI {
         ChatCompletionResponse getChatCompletion(@Body String input);
     }
 
-    public ChatCompletionResponse sendOpenAIRequest(String question, String context) {
-        String requestBody = "{\n" +
-                "     \"model\": \"gpt-3.5-turbo\",\n" +
-                "     \"messages\": [{\"role\": \"user\", \"content\": \""+context+" "+question+"\"}],\n" +
-                "     \"temperature\": 0.7\n" +
-                "   }";
-        System.out.println(requestBody);
-        return httpClient.getChatCompletion(requestBody);
+    public String sendOpenAIRequest(String question, String context) {
+
+        OpenAiService service = new OpenAiService(apiKey, Duration.ofSeconds(30));
+        final List<ChatMessage> messages = new ArrayList<>();
+        final ChatMessage systemMessage = new ChatMessage(ChatMessageRole.SYSTEM.value(), question + " in ten sentences in polish");
+        final ChatMessage userMessage = new ChatMessage(ChatMessageRole.USER.value(), context);
+        messages.add(systemMessage);
+        messages.add(userMessage);
+        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest
+                .builder()
+                .model("gpt-3.5-turbo")
+                .messages(messages)
+                .n(1)
+                .maxTokens(500)
+                .logitBias(new HashMap<>())
+                .build();
+
+        StringBuilder stringBuilder = new StringBuilder();
+        service.streamChatCompletion(chatCompletionRequest)
+                .doOnError(Throwable::printStackTrace)
+                .blockingForEach(chatCompletionChunk -> stringBuilder.append(chatCompletionChunk.getChoices().get(0).getMessage().getContent()));
+        return stringBuilder.toString();
     }
 }

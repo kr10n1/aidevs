@@ -1,8 +1,11 @@
 package com.example;
 
 import io.micronaut.context.ApplicationContext;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.HttpStatus;
 import io.micronaut.runtime.Micronaut;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Application {
@@ -12,27 +15,34 @@ public class Application {
 
         AIDevsZadania bean = run.getBean(AIDevsZadania.class);
         String token = bean.getToken();
-        ApiTaskResponse apiTaskResponse = bean.receiveTask(token);
+        ApiBlogResponse apiTaskResponse = bean.receiveTask(token);
 
-        String withoutQuestionMark = apiTaskResponse.getQuestion().replaceAll("\\?$", "");
-
-        // Split the string into words
-        String[] words = withoutQuestionMark.split("\\s+");
-
-        String name = words[words.length - 1];
-
-        List<String> strings = apiTaskResponse.getInput().stream().filter(s1 -> s1.contains(name)).toList();
-
-        System.out.println(strings);
 
         OpenAIAPI openAIAPI = run.getBean(OpenAIAPI.class);
 
-        ChatCompletionResponse response = openAIAPI.sendOpenAIRequest(apiTaskResponse.getQuestion(), strings.toString());
-        String message = response.getChoices().stream().findFirst().get().message.content;
-        System.out.println("OpenAI Response: " + message);
-
-        bean.answer(token, message);
-
+        List<String> strings = new ArrayList<>();
+        for(String chapter : apiTaskResponse.blog) {
+            String response = openAIAPI.sendOpenAIRequest(apiTaskResponse.msg, chapter);
+//            System.out.println("OpenAI Response: " + response);
+            strings.add(response);
+        }
+        HttpResponse<Object> answer = bean.answer(token, getAnswer(strings));
+        System.out.println(answer.toString());
         run.close();
     }
+
+    private static String getAnswer(List<String> strings) {
+        return "[\"" + strings.stream()
+                .map(s -> replaceNull(s))
+                .reduce((s, s2) -> s.concat("\",\"").concat(s2)).get() + "\"]";
+    }
+
+    private static String replaceNull(String strings) {
+        return strings.replace("null", "").replaceAll("[\\r\\n]", "");
+    }
 }
+
+
+//{"answer": ["Optional[Witajcie miłośnicy pizzy! Dziś chciałabym podzielić się z Wami nie tylko przepisem na idealną pizzę, ale także kilkoma ciekawostnull","Pierwszorzędna pizza wymaga starannie dobranych składników, aby stworzyć nieodparcie smakowitą kompozycję. Oto niezbędne składniki, którenull","Robienie pizzy – jak stworzyć wspaniałą własnoręcznie zrobioną pizzę w domu
+
+//Pizza jest jednym z najbardziej popularnych dań na całym świecie. Jejnull","Jest coś magicznego w pizzy, prawda? Smak świeżego ciasta, aromatyczne składniki i ser roztopiony na wierzchu – to wszystko sprawia, że pizzanull]"]}
