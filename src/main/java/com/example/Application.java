@@ -20,14 +20,12 @@ public class Application {
 
 
         OpenAIAPI openAIAPI = run.getBean(OpenAIAPI.class);
-        List<Embedding> response = openAIAPI.sendEmbeddingRequest((apiTaskResponse.msg.split(":")[1]));
-        String s = response.stream()
-                .map(embedding -> embedding.getEmbedding())
-                .reduce((doubles, doubles2) -> {
-                    doubles.addAll(doubles2);
-                    return doubles;
-                }).map(Object::toString).get();
-        HttpResponse<Object> answer = bean.answer(token, s);
+        var response = openAIAPI.sendOpenAIRequest(apiTaskResponse.msg, apiTaskResponse.hint1 + " Important: Respond with only code without any additional comments");
+
+        String substring = response.replace("null", "");
+        var response3 = "\"" + substring.replaceAll("\\n", "") + "\"";
+
+        HttpResponse<Object> answer = bean.answer(token, response3);
         System.out.println(answer.toString());
         System.exit(0);
     }
