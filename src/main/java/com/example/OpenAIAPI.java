@@ -3,6 +3,8 @@ package com.example;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatMessageRole;
+import com.theokanning.openai.moderation.Moderation;
+import com.theokanning.openai.moderation.ModerationRequest;
 import com.theokanning.openai.service.OpenAiService;
 import io.micronaut.http.HttpHeaders;
 import io.micronaut.http.MediaType;
@@ -21,7 +23,7 @@ import java.util.List;
 public class OpenAIAPI {
 
     final static String apiKey = "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";
-    final static String apiUrl = "https://api.openai.com/v1/chat/completions";
+    final static String apiUrl = "https://api.openai.com/v1/chat/moderations";
     final ChatCompletionHttpClient httpClient;
 
     public OpenAIAPI(ChatCompletionHttpClient httpClient) {
@@ -51,7 +53,7 @@ public class OpenAIAPI {
 
         OpenAiService service = new OpenAiService(apiKey, Duration.ofSeconds(30));
         final List<ChatMessage> messages = new ArrayList<>();
-        final ChatMessage systemMessage = new ChatMessage(ChatMessageRole.SYSTEM.value(), question + " in ten sentences in polish");
+        final ChatMessage systemMessage = new ChatMessage(ChatMessageRole.SYSTEM.value(), question);
         final ChatMessage userMessage = new ChatMessage(ChatMessageRole.USER.value(), context);
         messages.add(systemMessage);
         messages.add(userMessage);
@@ -69,5 +71,20 @@ public class OpenAIAPI {
                 .doOnError(Throwable::printStackTrace)
                 .blockingForEach(chatCompletionChunk -> stringBuilder.append(chatCompletionChunk.getChoices().get(0).getMessage().getContent()));
         return stringBuilder.toString();
+    }
+
+    public List<Moderation> sendModerationRequest(String input) {
+
+        OpenAiService service = new OpenAiService(apiKey, Duration.ofSeconds(30));
+        ModerationRequest request = ModerationRequest.builder()
+                .model("text-moderation-latest")
+                .input(input)
+                .build();
+
+
+        StringBuilder stringBuilder = new StringBuilder();
+        List<Moderation> results = service.createModeration(request)
+                .results;
+        return results;
     }
 }

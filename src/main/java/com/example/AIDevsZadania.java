@@ -14,8 +14,8 @@ import jakarta.inject.Inject;
 
 public class AIDevsZadania {
 
-    public @Nullable ApiBlogResponse receiveTask(String token) {
-        HttpResponse<ApiBlogResponse> response = tokenClient.getTask(token);
+    public @Nullable ApiModerationResponse receiveTask(String token) {
+        HttpResponse<ApiModerationResponse> response = tokenClient.getTask(token);
         if (response.status().getCode() == 200) {
             System.out.println("Token request successful. Response: " + response.body());
         } else {
@@ -30,11 +30,11 @@ public class AIDevsZadania {
         @Post("/answer/{token}")
         HttpResponse<Object> answer(String token, @Body String json);
 
-        @Post("/token/blogger")
+        @Post("/token/moderation")
         HttpResponse<ApiTokenResponse> getToken(@Body ApiKeyRequest request);
 
         @Get("/task/{token}")
-        HttpResponse<ApiBlogResponse> getTask(String token);
+        HttpResponse<ApiModerationResponse> getTask(String token);
 
         @Error(status = HttpStatus.BAD_REQUEST)
         default Object handleHttpError(Exception e) {
