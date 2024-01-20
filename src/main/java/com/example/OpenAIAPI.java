@@ -3,9 +3,12 @@ package com.example;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatMessageRole;
+import com.theokanning.openai.embedding.Embedding;
+import com.theokanning.openai.embedding.EmbeddingRequest;
 import com.theokanning.openai.moderation.Moderation;
 import com.theokanning.openai.moderation.ModerationRequest;
 import com.theokanning.openai.service.OpenAiService;
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.http.HttpHeaders;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Body;
@@ -16,6 +19,7 @@ import jakarta.inject.Singleton;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -25,9 +29,11 @@ public class OpenAIAPI {
     final static String apiKey = "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";
     final static String apiUrl = "https://api.openai.com/v1/chat/moderations";
     final ChatCompletionHttpClient httpClient;
+    final OpenAiService service;
 
     public OpenAIAPI(ChatCompletionHttpClient httpClient) {
         this.httpClient = httpClient;
+        service = new OpenAiService(apiKey, Duration.ofSeconds(30));
     }
 
     /*
@@ -49,9 +55,15 @@ public class OpenAIAPI {
         ChatCompletionResponse getChatCompletion(@Body String input);
     }
 
+    public List<Embedding> sendEmbeddingRequest(@NonNull String input) {
+        EmbeddingRequest request =  EmbeddingRequest.builder()
+                .model("text-embedding-ada-002")
+                .input(Collections.singletonList(input))
+                .user("adam.slomka@gmail.com")
+                .build();
+        return service.createEmbeddings(request).getData();
+    }
     public String sendOpenAIRequest(String question, String context) {
-
-        OpenAiService service = new OpenAiService(apiKey, Duration.ofSeconds(30));
         final List<ChatMessage> messages = new ArrayList<>();
         final ChatMessage systemMessage = new ChatMessage(ChatMessageRole.SYSTEM.value(), question);
         final ChatMessage userMessage = new ChatMessage(ChatMessageRole.USER.value(), context);
@@ -75,14 +87,10 @@ public class OpenAIAPI {
 
     public List<Moderation> sendModerationRequest(String input) {
 
-        OpenAiService service = new OpenAiService(apiKey, Duration.ofSeconds(30));
         ModerationRequest request = ModerationRequest.builder()
                 .model("text-moderation-latest")
                 .input(input)
                 .build();
-
-
-        StringBuilder stringBuilder = new StringBuilder();
         List<Moderation> results = service.createModeration(request)
                 .results;
         return results;

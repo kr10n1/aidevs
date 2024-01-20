@@ -1,5 +1,6 @@
 package com.example;
 
+import com.theokanning.openai.embedding.Embedding;
 import com.theokanning.openai.moderation.Moderation;
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.http.HttpResponse;
@@ -19,18 +20,15 @@ public class Application {
 
 
         OpenAIAPI openAIAPI = run.getBean(OpenAIAPI.class);
-
-        List<String> strings = new ArrayList<>();
-        for(String chapter : apiTaskResponse.input) {
-            List<Moderation> response = openAIAPI.sendModerationRequest(chapter);
-//            System.out.println("OpenAI Response: " + response);
-            boolean flagged = response.get(0).flagged;
-            String result = flagged ? "1" : "0";
-            strings.add(result);
-        }
-        HttpResponse<Object> answer = bean.answer(token, getAnswer(strings));
+        List<Embedding> response = openAIAPI.sendEmbeddingRequest((apiTaskResponse.msg.split(":")[1]));
+        String s = response.stream()
+                .map(embedding -> embedding.getEmbedding())
+                .reduce((doubles, doubles2) -> {
+                    doubles.addAll(doubles2);
+                    return doubles;
+                }).map(Object::toString).get();
+        HttpResponse<Object> answer = bean.answer(token, s);
         System.out.println(answer.toString());
-        run.close();
         System.exit(0);
     }
 
