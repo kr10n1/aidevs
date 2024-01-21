@@ -21,7 +21,7 @@ import java.net.http.HttpRequest;
 
 public class AIDevsZadania {
 
-    public @Nullable ApiWhisperResponse receiveTask(String token) {
+    public @Nullable ApiRodoResponse receiveTask(String token) {
         var response = tokenClient.getTask(token);
         if (response.status().getCode() == 200) {
             System.out.println("Token request successful. Response: " + response.body());
@@ -57,11 +57,11 @@ public class AIDevsZadania {
         @Post("/answer/{token}")
         HttpResponse<Object> answer(String token, @Body String json);
 
-        @Post("/token/whisper")
+        @Post("/token/rodo")
         HttpResponse<ApiTokenResponse> getToken(@Body ApiKeyRequest request);
 
         @Get("/task/{token}")
-        HttpResponse<ApiWhisperResponse> getTask(String token);
+        HttpResponse<ApiRodoResponse> getTask(String token);
 
         @Error(status = HttpStatus.BAD_REQUEST)
         default Object handleHttpError(Exception e) {

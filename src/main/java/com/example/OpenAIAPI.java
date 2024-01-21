@@ -66,10 +66,10 @@ public class OpenAIAPI {
                 .build();
         return service.createEmbeddings(request).getData();
     }
-    public String sendOpenAIRequest(String question, String context) {
+    public String sendOpenAIRequest(String systemContext, String userContext) {
         final List<ChatMessage> messages = new ArrayList<>();
-        final ChatMessage systemMessage = new ChatMessage(ChatMessageRole.SYSTEM.value(), question);
-        final ChatMessage userMessage = new ChatMessage(ChatMessageRole.USER.value(), context);
+        final ChatMessage systemMessage = new ChatMessage(ChatMessageRole.SYSTEM.value(), systemContext);
+        final ChatMessage userMessage = new ChatMessage(ChatMessageRole.USER.value(), userContext);
         messages.add(systemMessage);
         messages.add(userMessage);
         ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest

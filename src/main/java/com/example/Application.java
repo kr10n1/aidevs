@@ -14,30 +14,15 @@ public class Application {
 
     public static void main(String[] args) throws Exception {
         ApplicationContext run = Micronaut.run(Application.class, args);
-
-        AIDevsZadania bean = run.getBean(AIDevsZadania.class);
-        String token = bean.getToken();
-        var apiTaskResponse = bean.receiveTask(token);
-
-
-        OpenAIAPI openAIAPI = run.getBean(OpenAIAPI.class);
-
-        String url = apiTaskResponse.msg.substring(apiTaskResponse.msg.indexOf("https"));
-        File file = bean.receiveAudioFile(url);
-        var response = openAIAPI.sendTranscriptionRequest(file);
-
-        HttpResponse<Object> answer = bean.answer(token, "\"" + response + "\"");
-        System.out.println(answer.toString());
-        System.exit(0);
     }
 
-    private static String getAnswer(List<String> strings) {
+    static String getAnswer(List<String> strings) {
         return "[\"" + strings.stream()
                 .map(s -> replaceNull(s))
                 .reduce((s, s2) -> s.concat("\",\"").concat(s2)).get() + "\"]";
     }
 
-    private static String replaceNull(String strings) {
+    static String replaceNull(String strings) {
         return strings.replace("null", "").replaceAll("[\\r\\n]", "");
     }
 }
