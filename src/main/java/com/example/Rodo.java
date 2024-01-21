@@ -10,7 +10,7 @@ import jakarta.inject.Singleton;
 import static com.example.Application.replaceNull;
 
 @Context
-//@Requires(env = "rodo")
+@Requires(env = "rodo")
 public class Rodo {
 @PostConstruct
 public void init(ApplicationContext run){
