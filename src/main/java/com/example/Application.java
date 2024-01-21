@@ -6,6 +6,7 @@ import io.micronaut.context.ApplicationContext;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.runtime.Micronaut;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,24 +21,12 @@ public class Application {
 
 
         OpenAIAPI openAIAPI = run.getBean(OpenAIAPI.class);
-        var response = openAIAPI.sendOpenAIRequest(apiTaskResponse.msg, apiTaskResponse.hint1 + " Important: Respond with only code without any additional comments");
 
-        String substring = response.replace("null", "");
-        var response3 = "\"" + substring.replaceAll("\\n", "") + "\"";
+        String url = apiTaskResponse.msg.substring(apiTaskResponse.msg.indexOf("https"));
+        File file = bean.receiveAudioFile(url);
+        var response = openAIAPI.sendTranscriptionRequest(file);
 
-        response3 = "{" +
-                "\"name\": \"addUser\"," +
-                "\"description\": \"add user\"," +
-                "\"parameters\": {" +
-                "\"type\": \"object\"," +
-                "\"properties\": {" +
-                "\"name\": { \"type\":  \"string\"}," +
-                "\"surname\":  { \"type\":  \"string\"}," +
-                "\"year\":  { \"type\":  \"integer\"}" +
-                "},\"type\": \"object\" " +
-                "}" +
-                "}";
-        HttpResponse<Object> answer = bean.answer(token, response3);
+        HttpResponse<Object> answer = bean.answer(token, "\"" + response + "\"");
         System.out.println(answer.toString());
         System.exit(0);
     }

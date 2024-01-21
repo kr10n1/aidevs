@@ -11,10 +11,17 @@ import io.micronaut.http.client.annotation.Client;
 import io.micronaut.serde.annotation.Serdeable;
 import jakarta.inject.Inject;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+
 
 public class AIDevsZadania {
 
-    public @Nullable ApiFunctionsResponse receiveTask(String token) {
+    public @Nullable ApiWhisperResponse receiveTask(String token) {
         var response = tokenClient.getTask(token);
         if (response.status().getCode() == 200) {
             System.out.println("Token request successful. Response: " + response.body());
@@ -24,17 +31,37 @@ public class AIDevsZadania {
         return response.body();
     }
 
+    public File receiveAudioFile(String url) {
+        HttpRequest test = HttpRequest.newBuilder(URI.create(url)).GET().build();
+        try {
+            var bytes = HttpClient.newHttpClient().send(test, responseInfo -> java.net.http.HttpResponse.BodyHandlers.ofByteArray().apply(responseInfo));
+            return convertByteArrayToFile(bytes.body());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public static File convertByteArrayToFile(byte[] byteArray) throws IOException {
+        File file = new File("C:\\Dev\\mateusz.mp3");
+
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            fos.write(byteArray);
+        }
+
+        return file;
+    }
     @Client("https://zadania.aidevs.pl")
     interface TokenClient {
 
         @Post("/answer/{token}")
         HttpResponse<Object> answer(String token, @Body String json);
 
-        @Post("/token/functions")
+        @Post("/token/whisper")
         HttpResponse<ApiTokenResponse> getToken(@Body ApiKeyRequest request);
 
         @Get("/task/{token}")
-        HttpResponse<ApiFunctionsResponse> getTask(String token);
+        HttpResponse<ApiWhisperResponse> getTask(String token);
 
         @Error(status = HttpStatus.BAD_REQUEST)
         default Object handleHttpError(Exception e) {

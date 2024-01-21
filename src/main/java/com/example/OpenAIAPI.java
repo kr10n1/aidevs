@@ -1,5 +1,7 @@
 package com.example;
 
+import com.theokanning.openai.audio.CreateTranscriptionRequest;
+import com.theokanning.openai.audio.TranscriptionResult;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatMessageRole;
@@ -17,6 +19,7 @@ import io.micronaut.http.annotation.Post;
 import io.micronaut.http.client.annotation.Client;
 import jakarta.inject.Singleton;
 
+import java.io.File;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -83,6 +86,14 @@ public class OpenAIAPI {
                 .doOnError(Throwable::printStackTrace)
                 .blockingForEach(chatCompletionChunk -> stringBuilder.append(chatCompletionChunk.getChoices().get(0).getMessage().getContent()));
         return stringBuilder.toString();
+    }
+
+    public String sendTranscriptionRequest(File file) {
+        var request = CreateTranscriptionRequest.builder()
+                .model("whisper-1")
+                .build();
+        TranscriptionResult transcription = service.createTranscription(request, file);
+        return transcription.getText();
     }
 
     public List<Moderation> sendModerationRequest(String input) {
