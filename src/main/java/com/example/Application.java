@@ -25,6 +25,18 @@ public class Application {
         String substring = response.replace("null", "");
         var response3 = "\"" + substring.replaceAll("\\n", "") + "\"";
 
+        response3 = "{" +
+                "\"name\": \"addUser\"," +
+                "\"description\": \"add user\"," +
+                "\"parameters\": {" +
+                "\"type\": \"object\"," +
+                "\"properties\": {" +
+                "\"name\": { \"type\":  \"string\"}," +
+                "\"surname\":  { \"type\":  \"string\"}," +
+                "\"year\":  { \"type\":  \"integer\"}" +
+                "},\"type\": \"object\" " +
+                "}" +
+                "}";
         HttpResponse<Object> answer = bean.answer(token, response3);
         System.out.println(answer.toString());
         System.exit(0);
