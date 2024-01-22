@@ -22,7 +22,7 @@ public class Application {
                 .reduce((s, s2) -> s.concat("\",\"").concat(s2)).get() + "\"]";
     }
 
-    static String replaceNull(String strings) {
+    public static String replaceNull(String strings) {
         return strings.replace("null", "").replaceAll("[\\r\\n]", "");
     }
 }

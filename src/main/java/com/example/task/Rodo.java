@@ -1,5 +1,7 @@
-package com.example;
+package com.example.task;
 
+import com.example.AIDevsZadania;
+import com.example.OpenAIAPI;
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.context.annotation.Context;
 import io.micronaut.context.annotation.Requires;

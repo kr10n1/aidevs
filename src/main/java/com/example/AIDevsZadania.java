@@ -21,7 +21,7 @@ import java.net.http.HttpRequest;
 
 public class AIDevsZadania {
 
-    public @Nullable ApiRodoResponse receiveTask(String token) {
+    public @Nullable ApiScraperResponse receiveTask(String token) {
         var response = tokenClient.getTask(token);
         if (response.status().getCode() == 200) {
             System.out.println("Token request successful. Response: " + response.body());
@@ -31,19 +31,19 @@ public class AIDevsZadania {
         return response.body();
     }
 
-    public File receiveAudioFile(String url) {
+    public File receiveFile(String url, String fileName) {
         HttpRequest test = HttpRequest.newBuilder(URI.create(url)).GET().build();
         try {
             var bytes = HttpClient.newHttpClient().send(test, responseInfo -> java.net.http.HttpResponse.BodyHandlers.ofByteArray().apply(responseInfo));
-            return convertByteArrayToFile(bytes.body());
+            return convertByteArrayToFile(bytes.body(), fileName);
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
-    public static File convertByteArrayToFile(byte[] byteArray) throws IOException {
-        File file = new File("C:\\Dev\\mateusz.mp3");
+    public static File convertByteArrayToFile(byte[] byteArray, String fileName) throws IOException {
+        File file = new File("C:\\Dev\\" + fileName);
 
         try (FileOutputStream fos = new FileOutputStream(file)) {
             fos.write(byteArray);
@@ -57,11 +57,11 @@ public class AIDevsZadania {
         @Post("/answer/{token}")
         HttpResponse<Object> answer(String token, @Body String json);
 
-        @Post("/token/rodo")
+        @Post("/token/scraper")
         HttpResponse<ApiTokenResponse> getToken(@Body ApiKeyRequest request);
 
         @Get("/task/{token}")
-        HttpResponse<ApiRodoResponse> getTask(String token);
+        HttpResponse<ApiScraperResponse> getTask(String token);
 
         @Error(status = HttpStatus.BAD_REQUEST)
         default Object handleHttpError(Exception e) {
