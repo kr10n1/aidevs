@@ -33,11 +33,11 @@ public class Scraper {
         var apiScraperResponse = zadania.receiveTask(token);
         System.out.println(apiScraperResponse);
 
-        File file = zadania.receiveFile(apiScraperResponse.input, "text_pasta_history.txt");
+        File file = zadania.receiveFile(apiScraperResponse.msg, "text_pasta_history.txt");
         byte[] stream = new FileInputStream(file).readAllBytes();
         String s = new String(stream);
 
-        String response = api.sendOpenAIRequest(s, apiScraperResponse.question);
+        String response = api.sendOpenAIRequest(s, apiScraperResponse.msg);
 
         zadania.answer(token, "\"" + replaceNull(response) + "\"");
         System.exit(0);
