@@ -10,4 +10,8 @@ public class ApiQuestionRequest {
     public ApiQuestionRequest(String question) {
         this.question = question;
     }
+
+    public String getQuestion() {
+        return this.question;
+    }
 }

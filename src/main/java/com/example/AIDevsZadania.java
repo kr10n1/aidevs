@@ -24,7 +24,7 @@ public class AIDevsZadania {
         return response.body();
     }
     public @Nullable ApiQuestionResponse question(String token, String question) {
-        var response = AIDevsApi.question(new ApiQuestionRequest(question), token);
+        var response = AIDevsApi.question(token, "question=" + question);
         if (response.status().getCode() == 200) {
             System.out.println("Token request successful. Response: " + response.body());
         } else {

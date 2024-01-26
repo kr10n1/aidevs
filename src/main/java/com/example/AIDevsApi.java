@@ -1,11 +1,17 @@
 package com.example;
 
+import javax.print.attribute.standard.Media;
+
 import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Consumes;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Post;
+import io.micronaut.http.annotation.Produces;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.serde.annotation.Serdeable;
+import io.micronaut.http.MediaType.*;
 
 @Client("https://zadania.aidevs.pl")
 public interface AIDevsApi {
@@ -18,8 +24,8 @@ public interface AIDevsApi {
     @Get("/task/{token}")
     HttpResponse<ApiLiarResponse> getTask(String token);
 
-    @Post("/task/{token}")
-    HttpResponse<ApiQuestionResponse> question(ApiQuestionRequest question, String token);
+    @Post(value = "/task/{token}", produces = MediaType.APPLICATION_FORM_URLENCODED)
+    HttpResponse<ApiQuestionResponse> question(String token, @Body String question);
 
     @Serdeable
     class ApiKeyRequest {

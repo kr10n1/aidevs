@@ -23,7 +23,7 @@ public class Liar {
     @PostConstruct
     public void init() {
         String token = zadania.getToken();
-        var response = zadania.question(token,"Is Elvis alive ?");
+        var response = zadania.question(token,"Is Elvis alive?");
 //            answer = api.sendOpenAIRequest("Znajdź imię i nazwisko osoby którą opisuję. Jesli nie jesteś pewien na 100% odpowiedz wyłącznie: nie wiem", builder.toString());
         zadania.answer(token, "\"YES\"");
         System.exit(0);
