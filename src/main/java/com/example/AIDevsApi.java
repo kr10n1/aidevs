@@ -12,11 +12,11 @@ public interface AIDevsApi {
     @Post("/answer/{token}")
     HttpResponse<Object> answer(String token, @Body String json);
 
-    @Post("/token/liar")
+    @Post("/token/people")
     HttpResponse<ApiTokenResponse> getToken(@Body ApiKeyRequest request);
 
     @Get("/task/{token}")
-    HttpResponse<ApiLiarResponse> getTask(String token);
+    HttpResponse<ApiPeopleResponse> getTask(String token);
 
     @Post("/task/{token}")
     HttpResponse<ApiQuestionResponse> question(ApiQuestionRequest question, String token);

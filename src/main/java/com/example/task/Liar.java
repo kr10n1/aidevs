@@ -10,6 +10,7 @@ import io.micronaut.http.annotation.Body;
 import jakarta.annotation.PostConstruct;
 
 @Context
+@Requires(env = "liar")
 public class Liar {
 
     final AIDevsZadania zadania;

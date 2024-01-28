@@ -14,7 +14,7 @@ import java.net.http.HttpRequest;
 
 public class AIDevsZadania {
 
-    public @Nullable ApiLiarResponse receiveTask(String token) {
+    public @Nullable ApiPeopleResponse receiveTask(String token) {
         var response = AIDevsApi.getTask(token);
         if (response.status().getCode() == 200) {
             System.out.println("Token request successful. Response: " + response.body());
