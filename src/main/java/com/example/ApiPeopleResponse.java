@@ -39,7 +39,7 @@ public class ApiPeopleResponse {
         this.code = code;
         this.msg = msg;
         this.data = data;
-        this.quest = question;
+        this.question = question;
         this.hint1 = hint1;
         this.hint2 = hint2;
     }

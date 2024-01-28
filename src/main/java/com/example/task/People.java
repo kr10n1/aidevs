@@ -7,6 +7,7 @@ import com.example.PeopleDto;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micronaut.context.annotation.Context;
+import io.micronaut.context.annotation.Requires;
 import jakarta.annotation.PostConstruct;
 
 import java.io.File;
@@ -16,7 +17,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.example.Application.replaceNull;
+
 @Context
+@Requires(env = "people")
 public class People {
 
     final AIDevsZadania zadania;
@@ -39,12 +43,18 @@ public class People {
         List<PeopleDto> dto = objectMapper.readValue(json,  new TypeReference<List<PeopleDto>>(){});
 
         String question = task.getQuestion();
-        String name = api.sendOpenAIRequest("Potrzebuję wyciągnąć nazwisko z poniższego zdania. W odpowiedzi oczekuję wyłącznie nazwiska bez żadnych dodatkowych słów", question);
+        String name = replaceNull(api.sendOpenAIRequest("Potrzebuję wyciągnąć nazwisko z poniższego zdania. W odpowiedzi oczekuję wyłącznie nazwiska bez żadnych dodatkowych słów", question));
+        String surname = replaceNull(api.sendOpenAIRequest("Potrzebuję wyciągnąć imię z poniższego zdania. W odpowiedzi oczekuję wyłącznie imienia bez żadnych dodatkowych słów", question));
 
-        List<PeopleDto> collect = dto.stream().filter(peopleDto -> peopleDto.getNazwisko().contains(name))
-                .reduce(StringBuilder (peopleDtos, peopleDtos2) -> )
+        String description = dto.stream()
+                .filter(peopleDto -> peopleDto.getNazwisko().equals(name))
+                .filter(peopleDto -> peopleDto.getImie().equals(surname))
+                .map(PeopleDto::toString)
+                .collect(Collectors.joining(";\\n "));
 
-        api.sendOpenAIRequest("Odpowiedz na pytanie na podstawie poniższych danych: " + collect.red)
+        String answer = api.sendOpenAIRequest("Odpowiedz na pytanie na podstawie poniższych danych: " + description, question);
+
+        zadania.answer(token, answer);
         System.exit(0);
     }
 }

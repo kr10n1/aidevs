@@ -61,6 +61,19 @@ public class PeopleDto {
         return ulubiony_kolor;
     }
 
+    @Override
+    public String toString() {
+        return "" +
+                "mam na imie " + imie +
+                ", na nazwisko " + nazwisko +
+                ", moj wiek " + wiek +
+                ", o_mnie: " + o_mnie +
+                ", ulubiona postac z kapitana bomby " + ulubiona_postac_z_kapitana_bomby +
+                ", ulubiony serial " + ulubiony_serial +
+                ", ulubiony film " + ulubiony_film +
+                ", ulubiony kolor " + ulubiony_kolor;
+    }
+
     public void setUlubiony_kolor(String ulubiony_kolor) {
         this.ulubiony_kolor = ulubiony_kolor;
     }

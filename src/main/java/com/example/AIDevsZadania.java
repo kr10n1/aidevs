@@ -74,6 +74,6 @@ public class AIDevsZadania {
     }
 
     public void answer(String token, String answer) {
-        AIDevsApi.answer(token, "{\"answer\": " + answer + "}");
+        AIDevsApi.answer(token, "{\"answer\": \"" + Application.replaceNull(answer) + "\"}");
     }
 }

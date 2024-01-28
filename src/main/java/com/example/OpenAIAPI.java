@@ -29,7 +29,7 @@ import java.util.List;
 @Singleton
 public class OpenAIAPI {
 
-    final static String apiKey = "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";
+    final static String apiKey = System.getenv("OPENAI_API_KEY");
     final static String apiUrl = "https://api.openai.com/v1/chat/moderations";
     final ChatCompletionHttpClient httpClient;
     final OpenAiService service;
@@ -54,7 +54,7 @@ public class OpenAIAPI {
 
         @Post
         @Header(name = "Content-Type", value = MediaType.APPLICATION_JSON)
-        @Header(name = HttpHeaders.AUTHORIZATION, value = "Bearer " + apiKey)
+//        @Header(name = HttpHeaders.AUTHORIZATION, value = "Bearer " + apiKey)
         ChatCompletionResponse getChatCompletion(@Body String input);
     }
 
