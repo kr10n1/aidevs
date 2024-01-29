@@ -33,28 +33,28 @@ public class People {
 
     @PostConstruct
     public void init() throws IOException {
-        String token = zadania.getToken();
-        File file = zadania.receiveFile("https://zadania.aidevs.pl/data/people.json", "people.json");
-        var task = zadania.receiveTask(token);
-
-        FileInputStream stream = new FileInputStream(file);
-        String json = new String(stream.readAllBytes());
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<PeopleDto> dto = objectMapper.readValue(json,  new TypeReference<List<PeopleDto>>(){});
-
-        String question = task.getQuestion();
-        String name = replaceNull(api.sendOpenAIRequest("Potrzebuję wyciągnąć nazwisko z poniższego zdania. W odpowiedzi oczekuję wyłącznie nazwiska bez żadnych dodatkowych słów", question));
-        String surname = replaceNull(api.sendOpenAIRequest("Potrzebuję wyciągnąć imię z poniższego zdania. W odpowiedzi oczekuję wyłącznie imienia bez żadnych dodatkowych słów", question));
-
-        String description = dto.stream()
-                .filter(peopleDto -> peopleDto.getNazwisko().equals(name))
-                .filter(peopleDto -> peopleDto.getImie().equals(surname))
-                .map(PeopleDto::toString)
-                .collect(Collectors.joining(";\\n "));
-
-        String answer = api.sendOpenAIRequest("Odpowiedz na pytanie na podstawie poniższych danych: " + description, question);
-
-        zadania.answer(token, answer);
-        System.exit(0);
+//        String token = zadania.getToken();
+//        File file = zadania.receiveFile("https://zadania.aidevs.pl/data/people.json", "people.json");
+//        var task = zadania.receiveTask(token);
+//
+//        FileInputStream stream = new FileInputStream(file);
+//        String json = new String(stream.readAllBytes());
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        List<PeopleDto> dto = objectMapper.readValue(json,  new TypeReference<List<PeopleDto>>(){});
+//
+//        String question = task.getQuestion();
+//        String name = replaceNull(api.sendOpenAIRequest("Potrzebuję wyciągnąć nazwisko z poniższego zdania. W odpowiedzi oczekuję wyłącznie nazwiska bez żadnych dodatkowych słów", question));
+//        String surname = replaceNull(api.sendOpenAIRequest("Potrzebuję wyciągnąć imię z poniższego zdania. W odpowiedzi oczekuję wyłącznie imienia bez żadnych dodatkowych słów", question));
+//
+//        String description = dto.stream()
+//                .filter(peopleDto -> peopleDto.getNazwisko().equals(name))
+//                .filter(peopleDto -> peopleDto.getImie().equals(surname))
+//                .map(PeopleDto::toString)
+//                .collect(Collectors.joining(";\\n "));
+//
+//        String answer = api.sendOpenAIRequest("Odpowiedz na pytanie na podstawie poniższych danych: " + description, question);
+//
+//        zadania.answer(token, answer);
+//        System.exit(0);
     }
 }
