@@ -18,7 +18,7 @@ public interface AIDevsApi {
     @Post("/answer/{token}")
     HttpResponse<Object> answer(String token, @Body String json);
 
-    @Post("/token/knowledge")
+    @Post("/token/gnome")
     HttpResponse<ApiTokenResponse> getToken(@Body ApiKeyRequest request);
 
     @Get("/task/{token}")
